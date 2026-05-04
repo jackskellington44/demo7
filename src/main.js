@@ -814,7 +814,7 @@ async function openPostDetailModal(post, user) {
     downloadFiles.forEach(f => {
       const btn = document.createElement('button');
       btn.className   = 'pd-file-tab pd-file-tab-dl';
-      btn.innerHTML = `<span class="pd-tab-name">${f.name}</span><span class="pd-dl-icon">⤓</span>`;
+      btn.innerHTML = `</span><span class="pd-dl-icon">⤓</span><span class="pd-tab-name">${f.name}</span>`;
       btn.style.display = 'flex';
       btn.style.alignItems = 'center';
       btn.title       = f.name;
@@ -848,7 +848,7 @@ async function openPostDetailModal(post, user) {
     audioFiles.forEach(f => {
       const btn = document.createElement('button');
       btn.className   = 'pd-file-tab pd-file-tab-dl';
-      btn.innerHTML = `<span class="pd-tab-name">${f.name}</span><span class="pd-dl-icon">⤓</span>`;
+      btn.innerHTML = `</span><span class="pd-dl-icon">⤓</span><span class="pd-tab-name">${f.name}`;
       btn.style.display = 'flex';
       btn.style.alignItems = 'center';
       btn.title       = f.name;
@@ -898,7 +898,7 @@ async function loadConnectedTabs(post) {
     .from('post_links')
     .select('a_post_id, b_post_id')
     .or(`a_post_id.eq.${post.id},b_post_id.eq.${post.id}`)
-    .eq('group_id', 'group1');
+    .eq('group_id', 'group7');
 
   if (error || !links || links.length === 0) return;
 
@@ -1016,7 +1016,7 @@ async function loadCategories() {
   const { data, error } = await supabase
     .from('categories')
     .select('*')
-    .eq('group_id', 'group1')
+    .eq('group_id', 'group7')
     .order('name', { ascending: true });
 
   if (error) {
@@ -1043,7 +1043,7 @@ async function handleAddCategory() {
   try {
     const { error } = await supabase
       .from('categories')
-      .insert([{ name: name, group_id: 'group1' }]);
+      .insert([{ name: name, group_id: 'group7' }]);
 
     if (error) throw error;
 
@@ -1068,7 +1068,7 @@ async function loadLinks() {
   const { data, error } = await supabase
     .from('post_links')
     .select('id, a_post_id, b_post_id')
-    .eq('group_id', 'group1');
+    .eq('group_id', 'group7');
 
   if (error) {
     console.error('Failed to load links:', error);
@@ -1248,7 +1248,7 @@ async function loadNotifications() {
     .from('notifications')
     .select('id, type, post_id, actor_user_id, created_at')
     .eq('recipient_user_id', currentUser.id)
-    .eq('group_id', 'group1')
+    .eq('group_id', 'group7')
     .order('created_at', { ascending: false })
     .limit(MAX_NOTIFICATIONS);
 
@@ -1379,7 +1379,7 @@ async function openProfileModal(userId) {
     .from('posts')
     .select('id, title, body, file_name')
     .eq('user_id', userId)
-    .eq('group_id', 'group1')
+    .eq('group_id', 'group7')
     .order('created_at', { ascending: false });
 
   if (posts && posts.length > 0) {
@@ -1466,9 +1466,9 @@ async function saveProfileChanges() {
   if (newProfileCoverFile) {
     const path = `covers/${currentProfileUserId}-${Date.now()}.${newProfileCoverFile.name.split('.').pop()}`;
     const { error: upErr } = await supabase.storage
-      .from('group1-pfps').upload(path, newProfileCoverFile);
+      .from('group7-pfps').upload(path, newProfileCoverFile);
     if (upErr) { alert('Cover upload failed'); return; }
-    const { data: urlData } = supabase.storage.from('group1-pfps').getPublicUrl(path);
+    const { data: urlData } = supabase.storage.from('group7-pfps').getPublicUrl(path);
     updates.cover_image_url = urlData.publicUrl;
   }
 
@@ -1477,9 +1477,9 @@ async function saveProfileChanges() {
     const ext  = newProfilePfpFile.name.split('.').pop() || 'webp';
     const path = `${currentProfileUserId}-${Date.now()}.${ext}`;
     const { error: upErr } = await supabase.storage
-      .from('group1-pfps').upload(path, newProfilePfpFile);
+      .from('group7-pfps').upload(path, newProfilePfpFile);
     if (upErr) { alert('PFP upload failed'); return; }
-    const { data: urlData } = supabase.storage.from('group1-pfps').getPublicUrl(path);
+    const { data: urlData } = supabase.storage.from('group7-pfps').getPublicUrl(path);
     updates.pfp_url = urlData.publicUrl;
     updates.pfp     = null;
   }
@@ -1545,10 +1545,10 @@ async function handlePostSubmit() {
       fileType = await getFileType(file);
       const filePath = `${currentUser.id}/${Date.now()}-${file.name}`;
       const { error: uploadError } = await supabase.storage
-        .from('group1-posts').upload(filePath, file);
+        .from('group7-posts').upload(filePath, file);
       if (uploadError) throw uploadError;
       const { data: urlData } = supabase.storage
-        .from('group1-posts').getPublicUrl(filePath);
+        .from('group7-posts').getPublicUrl(filePath);
       fileURL = urlData.publicUrl;
 
     } else if (isMulti) {
@@ -1557,10 +1557,10 @@ async function handlePostSubmit() {
         const ft = await getFileType(file);
         const filePath = `${currentUser.id}/${Date.now()}-${file.name}`;
         const { error: uploadError } = await supabase.storage
-          .from('group1-posts').upload(filePath, file);
+          .from('group7-posts').upload(filePath, file);
         if (uploadError) throw uploadError;
         const { data: urlData } = supabase.storage
-          .from('group1-posts').getPublicUrl(filePath);
+          .from('group7-posts').getPublicUrl(filePath);
         filesArray.push({ url: urlData.publicUrl, name: file.name, type: ft });
       }
     }
@@ -1577,10 +1577,10 @@ async function handlePostSubmit() {
     if (coverFile) {
       const coverPath = `${currentUser.id}/covers/${Date.now()}-${coverFile.name}`;
       const { error: coverError } = await supabase.storage
-        .from('group1-posts').upload(coverPath, coverFile);
+        .from('group7-posts').upload(coverPath, coverFile);
       if (coverError) throw coverError;
       const { data: coverUrlData } = supabase.storage
-        .from('group1-posts').getPublicUrl(coverPath);
+        .from('group7-posts').getPublicUrl(coverPath);
       coverImageURL = coverUrlData.publicUrl;
     }
 
@@ -1637,7 +1637,7 @@ async function handlePostSubmit() {
 
     // ── CREATE ──
     postRecord.user_id  = currentUser.id;
-    postRecord.group_id = 'group1';
+    postRecord.group_id = 'group7';
 
     const created = await savePost(postRecord);
 
@@ -1648,7 +1648,7 @@ async function handlePostSubmit() {
       const b_post_id = a < b ? b : a;
       const { error: linkErr } = await supabase
         .from('post_links')
-        .insert([{ group_id: 'group1', a_post_id, b_post_id, created_by: currentUser.id }]);
+        .insert([{ group_id: 'group7', a_post_id, b_post_id, created_by: currentUser.id }]);
       if (linkErr) console.error('Failed to create link:', linkErr);
     }
 
@@ -1684,10 +1684,10 @@ async function handleCoverImageSubmit() {
 
   try {
     const filePath = `${currentUser.id}/covers/${Date.now()}-${coverFile.name}`;
-    const { error: uploadError } = await supabase.storage.from('group1-posts').upload(filePath, coverFile);
+    const { error: uploadError } = await supabase.storage.from('group7-posts').upload(filePath, coverFile);
     if (uploadError) throw uploadError;
 
-    const { data: urlData } = supabase.storage.from('group1-posts').getPublicUrl(filePath);
+    const { data: urlData } = supabase.storage.from('group7-posts').getPublicUrl(filePath);
     pendingPost.cover_image_url = urlData.publicUrl;
 
     const isEdit = pendingPost._isEdit;
@@ -1796,7 +1796,7 @@ async function loadCommentsForPost(postId) {
   if (commentUserIds.length > 0) {
     const { data: users, error: usersError } = await supabase
       .from('users')
-      .select('id, username')
+      .select('id, username, pfp, pfp_url')
       .in('id', commentUserIds);
 
     if (usersError) {
@@ -1820,16 +1820,126 @@ async function loadCommentsForPost(postId) {
     const row = document.createElement('div');
     row.className = 'comment-row';
 
-    const uname = commentUserMap[c.user_id]?.username || 'unknown';
+    const u = commentUserMap[c.user_id];
+    const uname = u?.username || 'unknown';
+    const pfpSrc = u?.pfp_url || (u?.pfp ? `./images/pfps/${u.pfp}` : './images/pfps/default.png');
+    const isOwn = currentUser && c.user_id === currentUser.id;
 
     row.innerHTML = `
-      <div class="comment-username">${uname}</div>
+      <div class="comment-header">
+        <img class="comment-pfp" src="${pfpSrc}" alt="">
+        <span class="comment-username">${uname}</span>
+      </div>
       <div class="comment-body">${c.body}</div>
     `;
+
+    // Double right-click to edit/delete own comments
+    if (isOwn) {
+      let lastRightClickComment = 0;
+
+      row.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const now = Date.now();
+        const timeSince = now - lastRightClickComment;
+        lastRightClickComment = now;
+
+        if (timeSince < DOUBLE_CLICK_THRESHOLD) {
+          lastRightClickComment = 0;
+          openCommentEditMode(row, c);
+        }
+      });
+    }
 
     commentsList.appendChild(row);
   });
 }
+
+function openCommentEditMode(row, comment) {
+  // Prevent double-opening
+  if (row.querySelector('.comment-edit-input')) return;
+
+  const bodyEl = row.querySelector('.comment-body');
+  const originalText = bodyEl.textContent;
+
+  // Replace body with an inline input + save/delete buttons
+  bodyEl.style.display = 'none';
+
+  const input = document.createElement('textarea');
+  input.className = 'comment-edit-input';
+  input.value = originalText;
+
+  const actions = document.createElement('div');
+  actions.className = 'comment-edit-actions';
+  actions.innerHTML = `
+    <button class="comment-edit-save">save</button>
+    <button class="comment-edit-delete">delete</button>
+  `;
+
+  row.appendChild(input);
+  row.appendChild(actions);
+  input.focus();
+  input.select();
+
+  // Cancel — restore original view
+    // Double right-click on the row closes edit mode
+  let lastRightClickEdit = 0;
+  const cancelEdit = () => {
+    input.remove();
+    actions.remove();
+    bodyEl.style.display = '';
+    row.removeEventListener('contextmenu', editContextHandler);
+  };
+  const editContextHandler = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const now = Date.now();
+    const timeSince = now - lastRightClickEdit;
+    lastRightClickEdit = now;
+    if (timeSince < DOUBLE_CLICK_THRESHOLD) {
+      lastRightClickEdit = 0;
+      cancelEdit();
+    }
+  };
+  row.addEventListener('contextmenu', editContextHandler);
+
+  // Save — update in DB then reload
+  actions.querySelector('.comment-edit-save').addEventListener('click', async () => {
+    const newText = input.value.trim();
+    if (!newText) return;
+    const { error } = await supabase
+      .from('comments')
+      .update({ body: newText })
+      .eq('id', comment.id)
+      .eq('user_id', currentUser.id);
+    if (error) { alert(`Save failed: ${error.message}`); return; }
+    await loadCommentsForPost(activePostForModal.id);
+  });
+
+  // Delete — remove from DB then reload
+  actions.querySelector('.comment-edit-delete').addEventListener('click', async () => {
+    const { error } = await supabase
+      .from('comments')
+      .delete()
+      .eq('id', comment.id)
+      .eq('user_id', currentUser.id);
+    if (error) { alert(`Delete failed: ${error.message}`); return; }
+    await loadCommentsForPost(activePostForModal.id);
+  });
+
+  // Enter = save, Escape = cancel
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      actions.querySelector('.comment-edit-save').click();
+    }
+        if (e.key === 'Escape') {
+      cancelEdit();
+    }
+  });
+}
+
 
 async function submitComment() {
   if (!activePostForModal) return;
@@ -1865,7 +1975,7 @@ async function loadPosts() {
     let query = supabase
       .from('posts')
       .select('*')
-      .eq('group_id', 'group1')
+      .eq('group_id', 'group7')
       .order('created_at', { ascending: false });
 
     if (editMode) {
@@ -2036,7 +2146,7 @@ function buildFilePreviewMarkup(post) {
     const label = getFilePreviewLabel(post.file_name || '');
     return `
       <div class="post-file-preview post-file-preview-video">
-        <video class="post-preview-video" src="${post.file_url}" muted loop autoplay playsinline preload="metadata"></video>
+        <video class="post-preview-video" src="${post.file_url}" muted loop autoplay playsinline preload="metadata" disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback" x-webkit-airplay="deny"></video>
         <div class="post-file-preview-label">${label}</div>
         <button class="post-preview-mute-btn" type="button" aria-label="toggle sound">X</button>
       </div>
@@ -2284,11 +2394,10 @@ if (titleEl && titleTrackEl) {
   const muteBtn = content.querySelector('.post-preview-mute-btn');
 
    if (previewVideo && muteBtn) {
-    muteBtn.textContent = '♪'; // starts muted — click to toggle sound
+    muteBtn.textContent = '♪'; // starts muted
 
-    // Hover to preview; pause when mouse leaves
-    previewVideo.addEventListener('mouseenter', () => previewVideo.play().catch(() => {}));
-    previewVideo.addEventListener('mouseleave', () => { previewVideo.pause(); });
+    // Ensure it's always playing (autoplay may be blocked on some browsers)
+    previewVideo.play().catch(() => {});
 
     // Prevent drag-drop placement from accidentally triggering mute
     muteBtn.addEventListener('mousedown', e => e.stopPropagation());
